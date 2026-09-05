@@ -1,49 +1,56 @@
-name: Q1 release Note
+name: Q1 Release Notes
+
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "version number" 
+        description: "Version number"
         type: string
         required: true
         default: "1.0.0"
       release_type:
-        description: "type of version"
+        description: "Type of release"
         type: choice
+        required: true
         default: patch
         options:
           - patch
           - minor
           - major
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
       build_tag: ${{ steps.tag.outputs.build_tag }}
-      build_date: ${{ steps.tag.outputs.build_date }}
+      build_date: ${{ steps.date.outputs.build_date }}
     steps:
-      id: tag
-      name: compute build tag
-      run: |
-        TAG:"v${{ input.version }}-${{ input.release_type }}-${{ github.run_numbers }}"
-        echo "build_tag=$TAG >> "GITHUB_OUTPUT"
-      id: date
-      name: compute build date
-      run: echo "build_date=$TAG"
-   announce:
-     runs-on: ubuntu-latest
-     steps:
-       - name: prints output
-         run: |
-           echo "build tag: ${{ needs.prepare.outputs.build_tag }}
-           echo "build date: ${{ needs.prepare.outputs.build_date }}
-       - name: write summary
-         run: |
-           {
-             echo "| Feild | Value |"
-             echo "| Feild | Value |"
-             echo "| version | ${{ inputs.version }} |"
-             echo "| Release Type | ${{ inputs.release_type }} |"
-             echo "| Build Tag | ${{ needs.prepare.outputs.build_tag }} |"
-             echo "| Build Date | ${{ needs.prepare.outputs.build_date }} |"
-           } >> "GITHUB_STEP_SUMMARY"
+      - id: tag
+        name: Compute build tag
+        run: |
+          TAG="v${{ inputs.version }}-${{ inputs.release_type }}-${{ github.run_number }}"
+          echo "build_tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - id: date
+        name: Compute build date
+        run: echo "build_date=$(date +%F)" >> "$GITHUB_OUTPUT"
+
+  announce:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print outputs
+        run: |
+          echo "Build tag: ${{ needs.prepare.outputs.build_tag }}"
+          echo "Build date: ${{ needs.prepare.outputs.build_date }}"
+
+      - name: Write summary
+        run: |
+          {
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Version | ${{ inputs.version }} |"
+            echo "| Release type | ${{ inputs.release_type }} |"
+            echo "| Build tag | ${{ needs.prepare.outputs.build_tag }} |"
+            echo "| Build date | ${{ needs.prepare.outputs.build_date }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
