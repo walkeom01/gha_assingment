@@ -23,5 +23,5 @@ jobs:
         run: echo "guard passed"
 
       - name: Notify
-        if: ${{ success() && failure() }}
+        if: ${{ always() }}
         run: echo "finished"
