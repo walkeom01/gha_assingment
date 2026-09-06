@@ -19,7 +19,7 @@ jobs:
         run: echo "Deploying $APP_NAME to ${{ inputs.environment }}"
 
       - name: Guarded step
-        if: $APP_NAME == 'demo-app'
+        if: ${{ env.APP_NAME == 'demo-app' }}
         run: echo "guard passed"
 
       - name: Notify
