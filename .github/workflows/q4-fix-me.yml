@@ -5,6 +5,11 @@ on:
     inputs:
       environment:
         description: Target environment
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
         default: staging
 
 env:
@@ -13,7 +18,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ inputs.environment == production }}
+
     steps:
       - name: Print target
         run: echo "Deploying $APP_NAME to ${{ inputs.environment }}"
@@ -21,7 +26,6 @@ jobs:
       - name: Simulated prod deploy
         if: ${{ inputs.environment == 'production' }}
         run: echo "SIMULATED PROD DEPLOY"
-
 
       - name: Guarded step
         if: ${{ env.APP_NAME == 'demo-app' }}
