@@ -18,6 +18,11 @@ jobs:
       - name: Print target
         run: echo "Deploying $APP_NAME to ${{ inputs.environment }}"
 
+      - name: Simulated prod deploy
+        if: ${{ inputs.environment == 'production' }}
+        run: echo "SIMULATED PROD DEPLOY"
+
+
       - name: Guarded step
         if: ${{ env.APP_NAME == 'demo-app' }}
         run: echo "guard passed"
